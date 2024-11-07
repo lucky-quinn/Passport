@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="home.css">
+    <title>Passport Upload</title>
+</head>
+<body>
+
+    <div class="upload-container">
+        <h1>Upload Passport</h1>
+        <input type="file" id="fileInput" class="file-input" accept="image/*" />
+        <button class="upload-btn" onclick="uploadFile()">Upload and Process</button>
+
+        <div id="previewContainer" class="preview-container" style="display: none;">
+            <h3>Extracted Passport Details:</h3>
+            <p><strong>Name:</strong> <span id="name"></span></p>
+            <p><strong>Document Number:</strong> <span id="documentnum"></span></p>
+            <p><strong>Expiry Date:</strong> <span id="expiryDate"></span></p>
+        </div>
+    </div>
+
+    <script>
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const previewContainer = document.getElementById('previewContainer');
+
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+
+                const formData = new FormData();
+                formData.append('passport', file);
+
+                // Send file to backend
+                fetch('http://localhost:8080/upload', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('name').textContent = data.name;
+                    document.getElementById('documentnum').textContent = data.documentnum;
+                    document.getElementById('expiryDate').textContent = data.expiryDate;
+                    previewContainer.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to process the passport image.');
+                });
+            } else {
+                alert("Please select a file to upload.");
+            }
+        }
+    </script>
+
+</body>
+</html>
